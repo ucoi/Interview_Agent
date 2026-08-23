@@ -4,6 +4,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
+import { Toaster } from "sonner"
 
 const monaSans = Mona_Sans({
   variable: "--font-mona-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({
       >
       <body className={`${monaSans.className} antialiased pattern`}>
       <ThemeProvider>{children}</ThemeProvider>
+      <Toaster/>
       </body>
       </html>
   )
