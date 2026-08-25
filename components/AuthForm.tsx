@@ -33,11 +33,20 @@ const AuthForm = ({ type }: { type: FormType }) => {
     },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log(data)
-    toast.success(
-      isSignIn ? "Signed in successfully" : "Account created successfully"
-    )
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    try{
+      if(type === `sign-up`){
+        toast.success("Sign up successfully. Please sign in") ;
+        router.push("/sign-in") ;
+      } else {
+        toast.success("Sign in successfully. Please sign in") ;
+        router.push("/") ;
+      }
+    }
+      catch (error){
+      console.log(error)
+      toast.error(`there was an error: ${error}`)
+    }
   }
   const isSignIn = type === "sign-in"
 
@@ -51,7 +60,8 @@ const AuthForm = ({ type }: { type: FormType }) => {
             height={32}
             width={38}
             style={{ width: "auto", height: "auto" }}
-          />          <h2 className="text-primary-100">PrepPilot</h2>
+          />
+          <h2 className="text-primary-100">PrepPilot</h2>
         </div>
 
         <h3>Practice job interviews with AI</h3>
@@ -75,7 +85,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
               control={form.control}
               name="email"
               label="Email"
-              placeholder="Your email address"
+              placeholder="Someone@.com"
               type="email"
             />
 
@@ -87,8 +97,16 @@ const AuthForm = ({ type }: { type: FormType }) => {
               type="password"
             />
 
-            <Button className="btn" type="submit">
-              {isSignIn ? "Sign In" : "Create an Account"}
+            <Button
+              className="btn"
+              type="submit"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting
+                ? "Please wait..."
+                : isSignIn
+                  ? "Sign In"
+                  : "Create an Account"}
             </Button>
           </form>
         </Form>
@@ -96,10 +114,10 @@ const AuthForm = ({ type }: { type: FormType }) => {
         <p className="text-center">
           {isSignIn ? "No account yet?" : "Have an account already?"}
           <Link
-            href={!isSignIn ? "/sign-in" : "/sign-up"}
-            className="text-user-primary ml-1 font-bold"
+            href={isSignIn ? "/sign-up" : "/sign-in"}
+            className="text-primary-200 ml-1 font-bold"
           >
-            {!isSignIn ? "Sign In" : "Sign Up"}
+            {isSignIn ? "Sign Up" : "Sign In"}
           </Link>
         </p>
       </div>
