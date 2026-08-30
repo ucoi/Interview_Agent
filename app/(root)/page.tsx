@@ -7,6 +7,9 @@ import { dummyInterviews } from "@/constrants"
 import InterviewCard from "@/components/InterviewCard"
 
 const Page = () => {
+  const hasPastInterviews = dummyInterviews.length > 0
+  const hasUpcomingInterviews = dummyInterviews.length > 0
+
   return (
     <>
       <section className="card-cta">
@@ -41,30 +44,37 @@ const Page = () => {
       <section className="mt-8 flex flex-col gap-4">
         <h2>Your interviews</h2>
         <div className="interviews-section">
-          <div className="flex w-full flex-col items-center justify-center gap-3 py-10 text-center">
-            <p className="text-light-100">
-              {dummyInterviews.map((interview) => (
-                <InterviewCard {...interview} key = {interview.id} />
-              ))}
-            </p>
-            <Button asChild className="btn-primary">
-              <Link href="/interview">Start your first interview</Link>
-            </Button>
-          </div>
+          {hasPastInterviews ? (
+            dummyInterviews.map((interview) => (
+              <InterviewCard {...interview} key={interview.id} />
+            ))
+          ) : (
+            <div className="flex w-full flex-col items-center justify-center gap-3 py-10 text-center">
+              <p className="text-light-100">
+                You haven&apos;t taken any interviews yet.
+              </p>
+              <Button asChild className="btn-primary">
+                <Link href="/interview">Start your first interview</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
       <section className="mt-8 flex flex-col gap-4">
         <h2>Available interviews</h2>
         <div className="interviews-section">
-          <div className="flex w-full flex-col items-center justify-center gap-3 py-10 text-center">
-            <p className="text-light-100">
-              {dummyInterviews.map((interview) => (
-                <InterviewCard {...interview} key = {interview.id} />
-              ))}
-              {/*<p>You have not taken any interviews yet </p>*/}
-            </p>
-          </div>
+          {hasUpcomingInterviews ? (
+            dummyInterviews.map((interview) => (
+              <InterviewCard {...interview} key={interview.id} />
+            ))
+          ) : (
+            <div className="flex w-full flex-col items-center justify-center gap-3 py-10 text-center">
+              <p className="text-light-100">
+                No interview templates available yet. Check back soon.
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </>
