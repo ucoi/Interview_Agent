@@ -93,9 +93,10 @@ const AuthForm = ({ type }: { type: FormType }) => {
           <Image
             src="/logo.svg"
             alt="logo"
-            height={32}
-            width={38}
-            style={{ width: "auto", height: "auto" }}
+            height={39}
+            width={45}
+            priority
+            className="h-8 w-auto"
           />
           <h2 className="text-primary-100">PrepPilot</h2>
         </div>
@@ -151,7 +152,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           {isSignIn ? "No account yet?" : "Have an account already?"}
           <Link
             href={isSignIn ? "/sign-up" : "/sign-in"}
-            className="text-primary-200 ml-1 font-bold"
+            className="ml-1 font-bold text-primary-200"
           >
             {isSignIn ? "Sign Up" : "Sign In"}
           </Link>

@@ -7,6 +7,11 @@ const ONE_WEEK = 60 * 60 * 24 * 7
 export async function signUp (params : SignUpParams){
   const {uid , name , email} = params;
 
+  function isFirebaseError(
+    error: unknown
+  ): error is { code: string; message: string } {
+    return typeof error === "object" && error !== null && "code" in error
+  }
 
   try{
     const userRecord = await db.collection('users').doc(uid).get();
@@ -24,20 +29,21 @@ export async function signUp (params : SignUpParams){
       success: true,
       message: 'Account created successfully. Please sign in.'
     }
-  }catch(e : any){
-    console.error('error creating user ', e);
-    if(e.code === 'auth/email-already-exists'){
-      return{
-        success:false,
-        message:'email already exists'
-      }
-    }
+  } catch (e: unknown) {
+  console.error('Error creating user:', e)
 
+  if (isFirebaseError(e) && e.code === 'auth/email-already-exists') {
     return {
-      success:false,
-      message:'failed to create account'
+      success: false,
+      message: 'Email already exists'
     }
   }
+
+  return {
+    success: false,
+    message: 'Failed to create account'
+  }
+}
 }
 
 export async function signIn(params: SignInParams) {
