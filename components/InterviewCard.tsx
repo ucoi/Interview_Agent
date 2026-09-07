@@ -6,15 +6,33 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import TechIcons from "@/components/TechIcons"
 
-const InterviewCard = ({interviewId , userId , role , type ,techstack, createdAt}: InterviewCardProps) => {
-  const feedback = null as Feedback | null ;
-  const normalizedType = /mix/gi.test(type) ? 'Mixed' : type ;
-  const formattedDate = dayjs(feedback?.createdAt || createdAt ).format('YYYY-MM-DD');
+const InterviewCard = ({
+  interviewId,
+  role,
+  type,
+  techstack,
+  createdAt,
+}: InterviewCardProps) => {
+  const feedback = null as Feedback | null
+  const normalizedType = /mix/gi.test(type) ? "Mixed" : type
+  const formattedDate = dayjs(feedback?.createdAt || createdAt).format(
+    "YYYY-MM-DD"
+  )
+
+  const badgeColor =
+    {
+      Behavioral: "bg-light-400",
+      Mixed: "bg-primary-200",
+      Technical: "bg-success-100",
+    }[normalizedType] || "bg-light-600"
+
   return (
-    <div className="card-border min-h-96 w-[360px] gap-6 max-sm:w-full">
+    <div className="card-border min-h-96 w-[360px] gap-6 transition-transform duration-200 hover:scale-110 hover:border-primary-200/50 max-sm:w-full">
       <div className="card-interview">
         <div>
-          <div className="absolute top-0 right-0 w-fit rounded-bl-lg bg-light-600 px-4 py-2">
+          <div
+            className={`absolute top-0 right-0 w-fit rounded-bl-lg px-4 py-2 ${badgeColor}`}
+          >
             <p className="badge-text">{normalizedType}</p>
           </div>
           <Image
@@ -29,30 +47,41 @@ const InterviewCard = ({interviewId , userId , role , type ,techstack, createdAt
             <div className="flex flex-row gap-2">
               <Image
                 src="/calendar.svg"
-                alt="callender"
+                alt="calendar"
                 width={22}
                 height={22}
+                className="h-[22px] w-[22px]"
               />
               <p>{formattedDate}</p>
             </div>
-            <div className="flex flex-row gap-2 items-center">
-              <Image src="/star.svg" alt="start" width={22} height={22}/>
-              <p>{feedback?.totalScore ?? '---'}/100</p>
+            <div className="flex flex-row items-center gap-2">
+              <Image
+                src="/star.svg"
+                alt="star"
+                width={22}
+                height={22}
+                className="h-[22px] w-[22px]"
+              />
+              <p>{feedback?.totalScore ?? "---"}/100</p>
             </div>
           </div>
-          <p className="line-clamp-2 mt-5">
-            {feedback?.finalAssessment || "You haven't taken any interviews yet. Take one now to start improving your skills   "}
+          <p className="mt-5 line-clamp-2">
+            {feedback?.finalAssessment ||
+              "You haven't taken this interview yet. Take it now to start improving your skills."}
           </p>
         </div>
         <div className="flex flex-row justify-between gap-2">
           <TechIcons techStack={techstack} />
           <Button className="btn-primary">
-            <Link href={feedback? `/interview/${interviewId}/feedback`
-              : `/interview/${interviewId}`
-            }>
-              {feedback? 'Check Feedback ' : 'View Interview '}
+            <Link
+              href={
+                feedback
+                  ? `/interview/${interviewId}/feedback`
+                  : `/interview/${interviewId}`
+              }
+            >
+              {feedback ? "Check Feedback" : "View Interview"}
             </Link>
-
           </Button>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import FormField from "./FormField"
 import { Form } from "@/components/ui/form"
 import { auth } from "@/firebase/client"
+import {Loader2} from "lucide-react"
 
 
 import {
@@ -93,12 +94,12 @@ const AuthForm = ({ type }: { type: FormType }) => {
           <Image
             src="/logo.svg"
             alt="logo"
-            height={39}
-            width={45}
+            height={32}
+            width={38}
             priority
             className="h-8 w-auto"
           />
-          <h2 className="text-primary-100">PrepPilot</h2>
+          <h2 className="text-primary-100">ReadyRole</h2>
         </div>
 
         <h3>Practice job interviews with AI</h3>
@@ -139,11 +140,16 @@ const AuthForm = ({ type }: { type: FormType }) => {
               type="submit"
               disabled={form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting
-                ? "Please wait..."
-                : isSignIn
-                  ? "Sign In"
-                  : "Create an Account"}
+              {form.formState.isSubmitting ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Please wait...
+                </span>
+              ) : isSignIn ? (
+                "Sign In"
+              ) : (
+                "Create an Account"
+              )}
             </Button>
           </form>
         </Form>
