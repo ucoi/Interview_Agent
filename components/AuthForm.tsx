@@ -23,7 +23,7 @@ const authFormSchema = (type: FormType) => {
   return z.object({
     name: type === "sign-up" ? z.string().min(3) : z.string().optional(),
     email: z.string().email(),
-    password: z.string().min(3),
+    password: z.string().min(6, "Password must be at least 6 characters"),
   })
 }
 
@@ -107,6 +107,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
+            method="post"
             className="form mt-4 w-full space-y-6"
           >
             {!isSignIn && (
@@ -123,7 +124,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
               control={form.control}
               name="email"
               label="Email"
-              placeholder="Someone@.com"
+              placeholder="you@example.com"
               type="email"
             />
 
