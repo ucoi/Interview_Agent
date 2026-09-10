@@ -1,16 +1,22 @@
 import React from "react"
 import { Button } from "@/components/ui/button"
-
 import Link from "next/link"
 import Image from "next/image"
-import { dummyInterviews } from "@/constrants"
 import InterviewCard from "@/components/InterviewCard"
-import { getCurrentUser } from "@/lib/actions/auth.actions"
+import { getCurrentUser, getInterviewByUserId, getLatestInterviews } from "@/lib/actions/auth.actions"
+import { redirect } from "next/navigation"
 
 const Page = async () => {
+
   const user = await getCurrentUser()
-  const hasPastInterviews = dummyInterviews.length > 0
-  const hasUpcomingInterviews = dummyInterviews.length > 0
+     if(!user) redirect('/sign-in')
+  const [userInterviews, latestInterviews] = await Promise.all([
+    await getInterviewByUserId(user.id),
+    await getLatestInterviews({ userId: user.id }),
+  ])
+
+  const hasPastInterviews = (userInterviews?.length ?? 0) > 0
+  const hasUpcomingInterviews = (latestInterviews?.length ?? 0) > 0
 
   const firstName = user?.name?.split(" ")[0]
   const capitalizedFirstName = firstName
@@ -26,8 +32,13 @@ const Page = async () => {
           </span>
 
           <h2 className="text-4xl leading-[1.1] font-bold tracking-tight sm:text-5xl">
-            {capitalizedFirstName ? `Welcome back, ${capitalizedFirstName}.` : "Walk into your next interview"}
-            <span className="text-primary"> {capitalizedFirstName ? "Ready to practice?" : "with confidence."}</span>
+            {capitalizedFirstName
+              ? `Welcome back, ${capitalizedFirstName}.`
+              : "Walk into your next interview"}
+            <span className="text-primary">
+              {" "}
+              {capitalizedFirstName ? "Ready to practice?" : "with confidence."}
+            </span>
           </h2>
 
           <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground sm:text-lg">
@@ -52,7 +63,7 @@ const Page = async () => {
         <h2>Your interviews</h2>
         <div className="interviews-section">
           {hasPastInterviews ? (
-            dummyInterviews.map((interview) => (
+            userInterviews?.map((interview) => (
               <InterviewCard {...interview} key={interview.id} />
             ))
           ) : (
@@ -72,7 +83,7 @@ const Page = async () => {
         <h2>Available interviews</h2>
         <div className="interviews-section">
           {hasUpcomingInterviews ? (
-            dummyInterviews.map((interview) => (
+            latestInterviews?.map((interview) => (
               <InterviewCard {...interview} key={interview.id} />
             ))
           ) : (
