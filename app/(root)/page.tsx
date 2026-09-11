@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 import InterviewCard from "@/components/InterviewCard"
-import { getCurrentUser, getInterviewByUserId, getLatestInterviews } from "@/lib/actions/auth.actions"
+import { getCurrentUser } from "@/lib/actions/auth.actions"
+import { getInterviewByUserId, getLatestInterviews, } from "@/lib/actions/general.actions"
 import { redirect } from "next/navigation"
 
 const Page = async () => {
