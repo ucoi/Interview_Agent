@@ -2,7 +2,7 @@
 
 An AI-powered mock interview platform that helps job seekers practice real interviews through natural voice conversations — powered by an AI interviewer (PrepPilot) — and get instant, structured feedback on their performance.
 
-🔗 **Live demo:** [interview-agent-22ug5iy31-ucois-projects.vercel.app](https://interview-agent-22ug5iy31-ucois-projects.vercel.app/)
+🔗 **Live demo:** [[interview-agent-22ug5iy31-ucois-projects.vercel.app](https://interview-agent-22ug5iy31-ucois-projects.vercel.app/](https://vercel.com/ucois-projects/interview-agent))
 
 ## Features
 
