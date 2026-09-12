@@ -13,7 +13,7 @@ import { redirect } from "next/navigation"
 
       <Agent userName ={user.name}
              userId = {user.id}
-             type = "interview"
+             type = "generate"
       />
     </>
   )
