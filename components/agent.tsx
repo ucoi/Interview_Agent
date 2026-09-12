@@ -1,7 +1,7 @@
 "use client"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { vapi } from "@/lib/vapi.sdk"
 import { interviewer } from "@/constrants"
@@ -15,21 +15,28 @@ enum CallStatus {
 }
 
 interface SavedMessage {
-  role: 'user' | 'system' | 'assistant'
+  role: "user" | "system" | "assistant"
   content: string
 }
 
-const Agent = ({ userName, userId, type , interviewId , questions}: AgentProps) => {
+const Agent = ({
+  userName,
+  userId,
+  type,
+  interviewId,
+  questions,
+}: AgentProps) => {
   const router = useRouter()
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE)
   const [messages, setMessages] = useState<SavedMessage[]>([])
+  const hasGeneratedFeedback = useRef(false)
 
   useEffect(() => {
     const onCallStart = () => setCallStatus(CallStatus.ACTIVE)
     const onCallEnd = () => setCallStatus(CallStatus.FINISHED)
     const onMessage = (message: Message) => {
-      if (message.type === 'transcript' && message.transcriptType === 'final') {
+      if (message.type === "transcript" && message.transcriptType === "final") {
         const newMessage = { role: message.role, content: message.transcript }
         setMessages((prev) => [...prev, newMessage])
       }
@@ -38,12 +45,12 @@ const Agent = ({ userName, userId, type , interviewId , questions}: AgentProps) 
     const onSpeechEnd = () => setIsSpeaking(false)
     const onError = (error: Error) => console.log(error)
 
-    vapi.on('call-start', onCallStart)
-    vapi.on('call-end', onCallEnd)
-    vapi.on('message', onMessage)
-    vapi.on('speech-start', onSpeechStart)
-    vapi.on('speech-end', onSpeechEnd)
-    vapi.on('error', onError)
+    vapi.on("call-start", onCallStart)
+    vapi.on("call-end", onCallEnd)
+    vapi.on("message", onMessage)
+    vapi.on("speech-start", onSpeechStart)
+    vapi.on("speech-end", onSpeechEnd)
+    vapi.on("error", onError)
 
     return () => {
       vapi.off("call-start", onCallStart)
@@ -55,52 +62,57 @@ const Agent = ({ userName, userId, type , interviewId , questions}: AgentProps) 
     }
   }, [])
 
-  const handleGenerateFeedback = async (messages : SavedMessage[]) => {
-    console.log('generate feedback here .') ;
-    const {success, feedbackId : id} = await createFeedback({
-      interviewId: interviewId! ,
-      userId : userId! ,
-      transcript: messages
-    })
+  const handleGenerateFeedback = useCallback(
+    async (messages: SavedMessage[]) => {
+      console.log("generate feedback here.")
+      const { success, feedbackId: id } = await createFeedback({
+        interviewId: interviewId!,
+        userId: userId!,
+        transcript: messages,
+      })
 
-    if(success && id){
-      router.push(`/interview/${interviewId}/feedback`)
-    }else {
-      console.log('no feedback here .')
-      router.push('/')
-    }
-  }
-  useEffect(() => {
-    if (callStatus === CallStatus.FINISHED){
-      if(type === 'generate'){
+      if (success && id) {
+        router.push(`/interview/${interviewId}/feedback`)
+      } else {
+        console.log("no feedback here.")
         router.push("/")
-      }else{
-        handleGenerateFeedback(messages)
+      }
+    },
+    [interviewId, userId, router]
+  )
+
+  useEffect(() => {
+    if (callStatus === CallStatus.FINISHED && !hasGeneratedFeedback.current) {
+      hasGeneratedFeedback.current = true
+      if (type === "generate") {
+        router.push("/")
+      } else {
+        void handleGenerateFeedback(messages)
       }
     }
-  }, [messages,callStatus,type,userId]);
+  }, [messages, callStatus, type, userId, router, handleGenerateFeedback])
 
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING)
-    if(type === 'generate'){
+    if (type === "generate") {
       await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
         variableValues: {
           username: userName,
           userid: userId,
-        }
+        },
       })
-    }else {
-      let formattedQuestions = '';
-      if(questions){
+    } else {
+      let formattedQuestions = ""
+      if (questions) {
         formattedQuestions = questions
-          .map(question => `-${question}`)
-          .join('\n')
+          .map((question) => `-${question}`)
+          .join("\n")
       }
 
-      await vapi.start(interviewer , {
+      await vapi.start(interviewer, {
         variableValues: {
           questions: formattedQuestions,
-        }
+        },
       })
     }
   }
@@ -111,7 +123,8 @@ const Agent = ({ userName, userId, type , interviewId , questions}: AgentProps) 
   }
 
   const latestMessage = messages[messages.length - 1]?.content
-  const isCallInactiveOrFinished = callStatus === CallStatus.INACTIVE || callStatus === CallStatus.FINISHED
+  const isCallInactiveOrFinished =
+    callStatus === CallStatus.INACTIVE || callStatus === CallStatus.FINISHED
 
   return (
     <>
@@ -166,7 +179,9 @@ const Agent = ({ userName, userId, type , interviewId , questions}: AgentProps) 
             </span>
           </button>
         ) : (
-          <button className="btn-disconnect" onClick={handleDisconnect}>END</button>
+          <button className="btn-disconnect" onClick={handleDisconnect}>
+            END
+          </button>
         )}
       </div>
     </>

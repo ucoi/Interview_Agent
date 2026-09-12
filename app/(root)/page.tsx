@@ -12,8 +12,8 @@ const Page = async () => {
   const user = await getCurrentUser()
      if(!user) redirect('/sign-in')
   const [userInterviews, latestInterviews] = await Promise.all([
-    await getInterviewByUserId(user.id),
-    await getLatestInterviews({ userId: user.id }),
+     getInterviewByUserId(user.id),
+     getLatestInterviews({ userId: user.id }),
   ])
 
   const hasPastInterviews = (userInterviews?.length ?? 0) > 0
@@ -65,7 +65,11 @@ const Page = async () => {
         <div className="interviews-section">
           {hasPastInterviews ? (
             userInterviews?.map((interview) => (
-              <InterviewCard {...interview} key={interview.id} />
+              <InterviewCard
+                {...interview}
+                currentUserId={user.id}
+                key={interview.id}
+              />
             ))
           ) : (
             <div className="flex w-full flex-col items-center justify-center gap-3 py-10 text-center">
@@ -85,7 +89,11 @@ const Page = async () => {
         <div className="interviews-section">
           {hasUpcomingInterviews ? (
             latestInterviews?.map((interview) => (
-              <InterviewCard {...interview} key={interview.id} />
+              <InterviewCard
+                {...interview}
+                currentUserId={user.id}
+                key={interview.id}
+              />
             ))
           ) : (
             <div className="flex w-full flex-col items-center justify-center gap-3 py-10 text-center">

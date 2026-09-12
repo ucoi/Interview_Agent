@@ -5,47 +5,61 @@ import { feedbackSchema } from "@/constrants"
 import { google } from "@ai-sdk/google"
 
 export async function getInterviewByUserId(userId: string): Promise<Interview[] | null> {
-  const interviews = await db
-    .collection("interviews")
-    .where("userId", "==", userId)
-    .orderBy("createdAt", "desc")
-    .get()
+  try {
+    const interviews = await db
+      .collection("interviews")
+      .where("userId", "==", userId)
+      .orderBy("createdAt", "desc")
+      .get()
 
-  return interviews.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Interview[]
+    return interviews.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Interview[]
+  } catch (err) {
+    console.error("Error fetching interviews by user id:", err)
+    return null
+  }
 }
 
 export async function getLatestInterviews(params: GetLatestInterviewsParams): Promise<Interview[] | null> {
   const { userId, limit = 20 } = params
-  const interviews = await db
-    .collection("interviews")
-    .where("finalized", "==", true)
-    .where("userId", "!=", userId)
-    .orderBy("createdAt", "desc")
-    .limit(limit)
-    .get()
+  try {
+    const interviews = await db
+      .collection("interviews")
+      .where("finalized", "==", true)
+      .where("userId", "!=", userId)
+      .orderBy("createdAt", "desc")
+      .limit(limit)
+      .get()
 
-  return interviews.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Interview[]
+    return interviews.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Interview[]
+  } catch (err) {
+    console.error("Error fetching latest interviews:", err)
+    return null
+  }
 }
 
 export async function getInterviewById(id: string): Promise<Interview | null> {
-  const interviews = await db
-    .collection('interviews')
-    .doc(id)
-    .get()
+  try {
+    const interview = await db
+      .collection('interviews')
+      .doc(id)
+      .get()
 
-  if (!interviews.exists) return null
+    if (!interview.exists) return null
 
-
-  return {
-    id: interviews.id,
-    ...interviews.data(),
-  } as Interview
+    return {
+      id: interview.id,
+      ...interview.data(),
+    } as Interview
+  } catch (err) {
+    console.error("Error fetching interview by id:", err)
+    return null
+  }
 }
 
 export async function createFeedback(params: CreateFeedbackParams){
@@ -96,21 +110,26 @@ export async function createFeedback(params: CreateFeedbackParams){
 }
 
 export async function getFeedbackByInterviewId(params: GetFeedbackByInterviewIdParams): Promise<Feedback | null> {
-  const { interviewId, userId} = params
+  const { interviewId, userId } = params
 
-  const feedback = await db
-    .collection('feedback')
-    .where( 'interviewId', "==", interviewId)
-    .where("userId", "==", userId)
-    .limit(1)
-    .get()
+  try {
+    const feedback = await db
+      .collection("feedback")
+      .where("interviewId", "==", interviewId)
+      .where("userId", "==", userId)
+      .limit(1)
+      .get()
 
-  if(feedback.empty) return null;
-  const feedbackDoc = feedback.docs[0];
-  return {
-    id : feedbackDoc.id,
-    ...feedbackDoc.data(),
-  } as Feedback ;
+    if (feedback.empty) return null
+    const feedbackDoc = feedback.docs[0]
+    return {
+      id: feedbackDoc.id,
+      ...feedbackDoc.data(),
+    } as Feedback
+  } catch (err) {
+    console.error("Error fetching feedback by interview id:", err)
+    return null
+  }
 }
 
 

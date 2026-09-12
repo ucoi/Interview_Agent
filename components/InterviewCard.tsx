@@ -10,14 +10,19 @@ import { getFeedbackByInterviewId } from "@/lib/actions/general.actions"
 const InterviewCard = async ({
   id,
   role,
-  userId,
+  currentUserId,
   type,
   techstack,
   createdAt,
 }: InterviewCardProps) => {
-  const feedback = userId && id
-    ? await getFeedbackByInterviewId({interviewId : id , userId})
-    : null ;
+  const feedback =
+    currentUserId && id
+      ? await getFeedbackByInterviewId({
+          interviewId: id,
+          userId: currentUserId,
+        })
+      : null
+  // ... rest unchanged ;
   const normalizedType = /mix/gi.test(type) ? "Mixed" : type
   const formattedDate = dayjs(feedback?.createdAt || createdAt).format(
     "YYYY-MM-DD"
@@ -78,11 +83,7 @@ const InterviewCard = async ({
           <TechIcons techStack={techstack} />
           <Button className="btn-primary">
             <Link
-              href={
-                feedback
-                  ? `/interview/${id}/feedback`
-                  : `/interview/${id}`
-              }
+              href={feedback ? `/interview/${id}/feedback` : `/interview/${id}`}
             >
               {feedback ? "Check Feedback" : "View Interview"}
             </Link>
